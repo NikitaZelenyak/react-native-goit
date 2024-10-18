@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "MyNewProject",
-    "slug": "MyNewProject",
+    "name": "react-native-goit",
+    "slug": "react-native-goit",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
