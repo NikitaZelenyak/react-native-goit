@@ -4,7 +4,7 @@ import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
 
 import { RegistrationScreen } from "./screens/RegestrationScreen";
-import { LoginScreen } from "./screens/LooginScreen";
+// import { LoginScreen } from "./screens/LooginScreen";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -28,12 +28,8 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      {/* <TouchableWithoutFeedback  onPress={} style={styles.firstScreensContainer}> */}
-      {/*       behavior={Platform.OS === "ios" ? "padding" : "height"} */}
-
-      {/* <RegistrationScreen /> */}
-      <LoginScreen />
-      {/* </TouchableWithoutFeedback> */}
+      <RegistrationScreen />
+      {/* <LoginScreen /> */}
     </View>
   );
 }
