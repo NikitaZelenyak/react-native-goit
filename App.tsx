@@ -3,8 +3,8 @@ import { useEffect } from "react";
 import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
 
-import { RegistrationScreen } from "./screens/RegestrationScreen";
-// import { LoginScreen } from "./screens/LooginScreen";
+// import { RegistrationScreen } from "./screens/RegestrationScreen";
+import { LoginScreen } from "./screens/LooginScreen";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -28,8 +28,8 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <RegistrationScreen />
-      {/* <LoginScreen /> */}
+      {/* <RegistrationScreen /> */}
+      <LoginScreen />
     </View>
   );
 }
