@@ -11,13 +11,15 @@ import {
 
 import { useState } from "react";
 
+import { navigationProps } from "../types/navigationType";
+
 import { COLORS } from "../styles/global";
 import { Input } from "../components/Inputs/Input";
 import { RoundedBTN } from "../components/Buttons/RoundedBTN";
 import { MainBTN } from "../components/Buttons/MainBTN";
 import { OnlyTextBTN } from "../components/Buttons/OnlyTextBTN";
 
-export const RegistrationScreen = () => {
+export const RegistrationScreen = ({ navigation }: navigationProps) => {
   const [secureTextEntry, setSecureTextEntry] = useState(true);
 
   const handlerSecureTextEntry = () => {
@@ -65,7 +67,10 @@ export const RegistrationScreen = () => {
 
             <View style={styles.buttonWrapper}>
               <MainBTN CTA={"Зареєстуватися"} />
-              <OnlyTextBTN CTA="Вже є акаунт? Увійти" />
+              <OnlyTextBTN
+                onPress={() => navigation.navigate("Login")}
+                CTA="Вже є акаунт? Увійти"
+              />
             </View>
           </View>
         </KeyboardAvoidingView>

@@ -6,4 +6,5 @@ export const COLORS = {
   main_accent_color: "#FF6C00",
   secondary_text_color: "#FFFFFF",
   secondary_accent_color: "#1B4371",
+  light_text_color: "#BDBDBD",
 };

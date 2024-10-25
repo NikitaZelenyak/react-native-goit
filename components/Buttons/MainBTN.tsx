@@ -5,15 +5,20 @@ import { COLORS } from "../../styles/global";
 
 interface MainBTNProps {
   CTA: string;
+  onPress?: () => void;
+  customStyles?: object;
+  customTextColor?: object;
 }
 
-export const MainBTN: FC<MainBTNProps> = ({ CTA }) => {
+export const MainBTN: FC<MainBTNProps> = ({
+  CTA,
+  onPress,
+  customStyles,
+  customTextColor,
+}) => {
   return (
-    <TouchableOpacity
-      style={styles.button}
-      onPress={() => alert("Button Pressed!")}
-    >
-      <Text style={styles.CTAText}>{CTA}</Text>
+    <TouchableOpacity style={[styles.button, customStyles]} onPress={onPress}>
+      <Text style={[styles.CTAText, customTextColor]}>{CTA}</Text>
     </TouchableOpacity>
   );
 };
@@ -27,7 +32,7 @@ const styles = StyleSheet.create({
   CTAText: {
     fontSize: 16,
     color: COLORS.secondary_text_color,
-    fontWeight : "400",
+    fontWeight: "400",
     lineHeight: 19,
     textAlign: "center",
   },

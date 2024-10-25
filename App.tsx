@@ -2,9 +2,9 @@ import { ActivityIndicator, StyleSheet, View } from "react-native";
 import { useEffect } from "react";
 import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
-
-// import { RegistrationScreen } from "./screens/RegestrationScreen";
-import { LoginScreen } from "./screens/LooginScreen";
+import "react-native-gesture-handler";
+import { StackNavigator } from "./navigation/StackNavigator";
+import { NavigationContainer } from "@react-navigation/native";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -27,10 +27,11 @@ export default function App() {
   }
 
   return (
-    <View style={styles.container}>
-      {/* <RegistrationScreen /> */}
-      <LoginScreen />
-    </View>
+    <NavigationContainer>
+      <View style={styles.container}>
+        <StackNavigator />
+      </View>
+    </NavigationContainer>
   );
 }
 

@@ -11,12 +11,14 @@ import {
 
 import { useState } from "react";
 
+import { navigationProps } from "../types/navigationType";
+
 import { COLORS } from "../styles/global";
 import { Input } from "../components/Inputs/Input";
 import { MainBTN } from "../components/Buttons/MainBTN";
 import { OnlyTextBTN } from "../components/Buttons/OnlyTextBTN";
 
-export const LoginScreen = () => {
+export const LoginScreen = ({ navigation }: navigationProps) => {
   const [secureTextEntry, setSecureTextEntry] = useState(true);
 
   const handlerSecureTextEntry = () => {
@@ -54,10 +56,14 @@ export const LoginScreen = () => {
             </View>
 
             <View style={styles.buttonWrapper}>
-              <MainBTN CTA={"Увійти"} />
+              <MainBTN
+                onPress={() => navigation.navigate("Main")}
+                CTA={"Увійти"}
+              />
               <View style={styles.textButtonWrapper}>
                 <Text style={styles.customText}>Немає акаунту?</Text>
                 <OnlyTextBTN
+                  onPress={() => navigation.navigate("Registration")}
                   textCustomStyle={styles.textCustomStyle}
                   CTA="Зареєструватися"
                 />
