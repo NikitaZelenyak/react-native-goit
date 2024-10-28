@@ -8,6 +8,8 @@ import AntDesign from "react-native-vector-icons/AntDesign";
 
 import { COLORS } from "../styles/global";
 import { Pressable } from "react-native";
+import { CameraScreen } from "../screens/CameraScreen";
+import { MapScreen } from "../screens/MapScreen";
 const Stack = createStackNavigator();
 export const StackNavigator = () => {
   return (
@@ -44,6 +46,34 @@ export const StackNavigator = () => {
         })}
         component={CommentsScreen}
       />
+
+<Stack.Screen
+        name="Map"
+        options={({ navigation }) => ({
+          headerTitle: "Map",
+          headerShown: true,
+          headerLeft: () => {
+            return (
+              <Pressable
+                onPress={() => {
+                  navigation.goBack();
+                }}
+                style={{ marginLeft: 10 }}
+              >
+                <AntDesign
+                  name="arrowleft"
+                  size={24}
+                  color={COLORS.primary_text_color}
+                />
+              </Pressable>
+            );
+          },
+          tabBarStyle: { display: "none" },
+        })}
+        component={MapScreen}
+      />
+
+      <Stack.Screen name="Camera" component={CameraScreen} />
       <Stack.Screen name="Main" component={BottomTabNavigator} />
     </Stack.Navigator>
   );

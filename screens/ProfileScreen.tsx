@@ -1,4 +1,11 @@
-import { Text, View, StyleSheet, Image, Pressable, TouchableOpacity } from "react-native";
+import {
+  Text,
+  View,
+  StyleSheet,
+  Image,
+  Pressable,
+  TouchableOpacity,
+} from "react-native";
 
 import { navigationProps } from "../types/navigationType";
 
@@ -72,12 +79,15 @@ export const ProfileScreen = ({ navigation }: navigationProps) => {
               </View>
 
               <View style={styles.elementWrapper}>
-                <FontAwesome5
-                  style={{ marginRight: 4 }}
-                  name="map-marker-alt"
-                  size={24}
-                  color={COLORS.light_text_color}
-                />
+                <Pressable onPress={() => navigation.navigate("Map")}>
+                  <FontAwesome5
+                    style={{ marginRight: 4 }}
+                    name="map-marker-alt"
+                    size={24}
+                    color={COLORS.light_text_color}
+                  />
+                </Pressable>
+
                 <Text>Ukraine</Text>
               </View>
             </View>

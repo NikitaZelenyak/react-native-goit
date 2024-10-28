@@ -4,6 +4,7 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
+  Image,
   TouchableOpacity,
 } from "react-native";
 
@@ -13,26 +14,78 @@ import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { MainBTN } from "../components/Buttons/MainBTN";
 
+import { navigationProps } from "../types/navigationType";
 import { Input } from "react-native-elements";
+import { useEffect, useState } from "react";
+import * as Location from "expo-location";
 
-export const AddPostScreen = () => {
+export const AddPostScreen = ({ navigation, route }: navigationProps) => {
+  const [data, setData] = useState({ description: "", place: "" });
+  const photoUri = route?.params?.photoUri;
+  const [location, setLocation] = useState({ latitude: 0, longitude: 0 });
+  const [click, setIsClick] = useState(false);
+
+  useEffect(() => {
+    if (!click) return;
+    (async () => {
+      let { status } = await Location.requestPermissionsAsync();
+      if (status !== "granted") {
+        console.log("Permission to access location was denied");
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      const coords = {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      };
+      setLocation(coords);
+    })();
+  }, []);
+
+  const createPostHandler = () => {
+    setIsClick(true);
+    navigation.navigate("Profile");
+  };
+
   return (
     <View style={styles.container}>
       <View>
         <View style={styles.imageContainer}>
-          <View>
-            <View style={styles.addImage}>
-              <AntDesign name="camera" size={24} color={COLORS.secondary_bg} />
+          {photoUri ? (
+            <Image style={styles.image} source={{ uri: photoUri }} />
+          ) : (
+            <View>
+              <TouchableOpacity
+                style={styles.addImage}
+                onPress={() =>
+                  navigation.navigate("Camera", { photoUri: null })
+                }
+              >
+                <AntDesign
+                  name="camera"
+                  size={24}
+                  color={COLORS.secondary_bg}
+                />
+              </TouchableOpacity>
             </View>
-          </View>
+          )}
         </View>
         <Text style={styles.text}>Завантажте фото</Text>
+
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
           <View style={styles.inputsWrapper}>
-            <Input placeholder="Назва..." />
             <Input
+              placeholder="Назва..."
+              onChangeText={(value) =>
+                setData((prev) => ({ ...prev, description: value }))
+              }
+            />
+            <Input
+              onChangeText={(value) =>
+                setData((prev) => ({ ...prev, place: value }))
+              }
               placeholder="Місцевість..."
               leftIcon={
                 <FontAwesome5
@@ -46,8 +99,15 @@ export const AddPostScreen = () => {
           </View>
         </KeyboardAvoidingView>
         <MainBTN
+          onPress={createPostHandler}
           customTextColor={styles.buttonText}
-          customStyles={styles.button}
+          customStyles={{
+            ...styles.button,
+            backgroundColor:
+              data.description && data.place
+                ? COLORS.main_accent_color
+                : COLORS.light_text_color,
+          }}
           CTA={"Опубліковати"}
         />
       </View>
@@ -74,6 +134,12 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
+    position: "relative",
+  },
+  image: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
   },
 
   addImage: {
@@ -98,10 +164,9 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 48,
-    backgroundColor: COLORS.secondary_bg,
   },
   buttonText: {
-    color: COLORS.light_text_color,
+    color: COLORS.main_bg,
   },
 
   removeBTN: {

@@ -6,6 +6,10 @@ type RootStackParamList = {
   Main: undefined;
   Home: undefined;
   Comments: undefined;
+  AddPost: { photoUri: string | null };
+  Camera: { photoUri: string | null };
+  Map: undefined;
+  Profile: undefined;
 };
 
 // Define the navigation prop type for LoginScreen
@@ -16,4 +20,5 @@ type LoginScreenNavigationProp = StackNavigationProp<
 
 export type navigationProps = {
   navigation: LoginScreenNavigationProp;
+  route: any;
 };
