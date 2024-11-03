@@ -8,6 +8,7 @@ interface MainBTNProps {
   onPress?: () => void;
   customStyles?: object;
   customTextColor?: object;
+  disabled?: boolean;
 }
 
 export const MainBTN: FC<MainBTNProps> = ({
@@ -15,9 +16,14 @@ export const MainBTN: FC<MainBTNProps> = ({
   onPress,
   customStyles,
   customTextColor,
+  disabled = false,
 }) => {
   return (
-    <TouchableOpacity style={[styles.button, customStyles]} onPress={onPress}>
+    <TouchableOpacity
+      disabled={disabled}
+      style={[styles.button, customStyles]}
+      onPress={onPress}
+    >
       <Text style={[styles.CTAText, customTextColor]}>{CTA}</Text>
     </TouchableOpacity>
   );

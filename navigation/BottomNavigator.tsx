@@ -3,7 +3,6 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { HomeScreen } from "../screens/HomeScreen";
 import { LogoutIcon } from "../assets/Icons/LogoutIcon";
 
-import { navigationProps } from "../types/navigationType";
 import { Pressable, View } from "react-native";
 import { StyleSheet } from "react-native";
 
@@ -12,10 +11,18 @@ import Ionicons from "react-native-vector-icons/Ionicons";
 import { COLORS } from "../styles/global";
 import { AddPostScreen } from "../screens/AddPostScreen";
 import { ProfileScreen } from "../screens/ProfileScreen";
+import { logoutDB } from "../helpers/auth";
+import { useDispatch } from "react-redux";
 
 const Tab = createBottomTabNavigator();
 
-export const BottomTabNavigator = ({ navigation }: navigationProps) => {
+export const BottomTabNavigator = () => {
+  const dispatch = useDispatch();
+
+  const onLogOut = () => {
+    logoutDB(dispatch);
+  };
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -36,7 +43,7 @@ export const BottomTabNavigator = ({ navigation }: navigationProps) => {
             />
           ),
           headerRight: () => (
-            <Pressable onPress={() => navigation.navigate("Login")}>
+            <Pressable onPress={onLogOut}>
               <LogoutIcon style={{ marginRight: 10 }} />
             </Pressable>
           ),

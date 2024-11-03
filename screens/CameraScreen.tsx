@@ -46,7 +46,6 @@ export const CameraScreen = ({ navigation, route }: navigationProps) => {
 
       if (photo?.uri) {
         navigation.navigate("AddPost", { photoUri: photo?.uri });
-        console.log(photo);
       }
     }
   };

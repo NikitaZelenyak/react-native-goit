@@ -6,6 +6,7 @@ import {
   Platform,
   Image,
   TouchableOpacity,
+  Pressable,
 } from "react-native";
 
 import { COLORS } from "../styles/global";
@@ -18,13 +19,25 @@ import { navigationProps } from "../types/navigationType";
 import { Input } from "react-native-elements";
 import { useEffect, useState } from "react";
 import * as Location from "expo-location";
+import { addPost } from "../helpers/firestore";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
+import { pickImage } from "../helpers/utils/pickImage";
 
 export const AddPostScreen = ({ navigation, route }: navigationProps) => {
   const [data, setData] = useState({ description: "", place: "" });
   const photoUri = route?.params?.photoUri;
   const [location, setLocation] = useState({ latitude: 0, longitude: 0 });
   const [click, setIsClick] = useState(false);
-
+  const [image, setImage] = useState<string | null>(null);
+  const [imageData, setImageData] = useState<{
+    imageFile: Blob;
+    fileName: string;
+  }>({
+    imageFile: new Blob(),
+    fileName: "",
+  });
+  const user = useSelector((state: RootState) => state.user);
   useEffect(() => {
     if (!click) return;
     (async () => {
@@ -42,17 +55,53 @@ export const AddPostScreen = ({ navigation, route }: navigationProps) => {
     })();
   }, []);
 
-  const createPostHandler = () => {
+  useEffect(() => {
+    const getPhotoData = async () => {
+      if (photoUri) {
+        const response = await fetch(photoUri);
+        const file = await response.blob();
+        const fileName = photoUri.split("/").pop() || "image.jpg";
+        setImageData({ imageFile: file, fileName });
+      }
+    };
+    getPhotoData();
+  }, [photoUri]);
+
+  // Inside your component
+  const onPickImage = async () => {
+    const result = await pickImage();
+    if (result) {
+      setImage(result.uri);
+      setImageData({ imageFile: result.imageFile, fileName: result.fileName });
+    }
+  };
+
+  const onAddPost = () => {
     setIsClick(true);
+    addPost(
+      user.uid,
+      data.place,
+      data.description,
+      imageData.imageFile,
+      imageData.fileName
+    );
     navigation.navigate("Profile");
   };
 
+  const onRemove = () => {
+    setImage("");
+    setImageData({
+      imageFile: new Blob(),
+      fileName: "",
+    });
+    setData({ description: "", place: "" });
+  };
   return (
     <View style={styles.container}>
       <View>
         <View style={styles.imageContainer}>
-          {photoUri ? (
-            <Image style={styles.image} source={{ uri: photoUri }} />
+          {photoUri || image ? (
+            <Image style={styles.image} source={{ uri: photoUri || image }} />
           ) : (
             <View>
               <TouchableOpacity
@@ -70,7 +119,9 @@ export const AddPostScreen = ({ navigation, route }: navigationProps) => {
             </View>
           )}
         </View>
-        <Text style={styles.text}>Завантажте фото</Text>
+        <Pressable onPress={onPickImage}>
+          <Text style={styles.text}>Завантажте фото</Text>
+        </Pressable>
 
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -99,7 +150,7 @@ export const AddPostScreen = ({ navigation, route }: navigationProps) => {
           </View>
         </KeyboardAvoidingView>
         <MainBTN
-          onPress={createPostHandler}
+          onPress={onAddPost}
           customTextColor={styles.buttonText}
           customStyles={{
             ...styles.button,
@@ -111,7 +162,7 @@ export const AddPostScreen = ({ navigation, route }: navigationProps) => {
           CTA={"Опубліковати"}
         />
       </View>
-      <TouchableOpacity style={styles.removeBTN}>
+      <TouchableOpacity onPress={onRemove} style={styles.removeBTN}>
         <FontAwesome name="trash-o" size={24} color={COLORS.light_text_color} />
       </TouchableOpacity>
     </View>

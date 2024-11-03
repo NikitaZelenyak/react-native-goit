@@ -1,18 +1,20 @@
 import { Text, View, StyleSheet, Image } from "react-native";
 
 import { COLORS } from "../styles/global";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
 
 export const HomeScreen = () => {
+  const user = useSelector((state: RootState) => state.user);
   return (
     <View style={styles.container}>
       <View style={styles.userWrapper}>
-        <Image
-          style={styles.image}
-          source={require("../assets/images/Rectangle 22.png")}
-        />
+        {user.profilePhoto && (
+          <Image style={styles.image} source={{ uri: user.profilePhoto }} />
+        )}
         <View>
-          <Text style={styles.userName}>Natali Romanova</Text>
-          <Text style={styles.userEmail}>email@example.com</Text>
+          <Text style={styles.userName}>{user.displayName}</Text>
+          <Text style={styles.userEmail}>{user.email}</Text>
         </View>
       </View>
     </View>

@@ -5,6 +5,7 @@ import {
   Image,
   Pressable,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
 
 import { navigationProps } from "../types/navigationType";
@@ -16,8 +17,69 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import { LogoutIcon } from "../assets/Icons/LogoutIcon";
+import { logoutDB } from "../helpers/auth";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../redux/store";
+import {
+  getImageUrl,
+  getPostsByUser,
+  removeUserProfilePhotos,
+  uploadImage,
+} from "../helpers/firestore";
+import { useCallback, useState } from "react";
+import { PostData } from "../types/postsDataTypes";
+import { pickImage } from "../helpers/utils/pickImage";
+import { setUserInfo } from "../redux/reducers/userSlice";
+import { useFocusEffect } from "@react-navigation/native";
 
 export const ProfileScreen = ({ navigation }: navigationProps) => {
+  const dispatch = useDispatch();
+  const [posts, setPosts] = useState<PostData[] | undefined>();
+
+  const [image, setImage] = useState<string | null>(null);
+
+  const onLogOut = () => {
+    logoutDB(dispatch);
+  };
+  const user = useSelector((state: RootState) => state.user);
+
+  const onPickImage = async () => {
+    await removeUserProfilePhotos(user.uid);
+    const result = await pickImage();
+    let imageUrl = "";
+    if (result?.imageFile && user.uid) {
+      const imageRef = await uploadImage(
+        user.uid,
+        result?.imageFile,
+        result?.fileName
+      );
+      imageUrl = await getImageUrl(imageRef);
+    }
+    setImage(imageUrl);
+    dispatch(
+      setUserInfo({
+        ...user,
+        profilePhoto: imageUrl,
+      })
+    );
+  };
+
+  const getPhotoPosts = async () => {
+    if (user.uid) {
+      const fetchedPosts = await getPostsByUser(user.uid);
+      setPosts(fetchedPosts);
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      getPhotoPosts();
+    }, [user.uid])
+  );
+
+  // console.log(posts);
+  console.log(user);
+
   return (
     <View>
       <Image
@@ -27,71 +89,77 @@ export const ProfileScreen = ({ navigation }: navigationProps) => {
       />
       <View style={styles.commonWrapper}>
         <View style={styles.container}>
-          <TouchableOpacity
-            style={styles.logoutBTN}
-            onPress={() => {
-              console.log("Navigating to Login");
-              navigation.navigate("Login");
-            }}
-          >
+          <TouchableOpacity style={styles.logoutBTN} onPress={onLogOut}>
             <LogoutIcon style={{ marginRight: 10 }} />
           </TouchableOpacity>
           <View style={styles.avatarBoxWrapper}>
             <View style={styles.avatarPlaceholder}>
-              <Image
-                style={styles.imageAvatar}
-                source={require("../assets/images/Rectangle 22.png")}
-              />
+              {user.profilePhoto && (
+                <Image
+                  style={styles.imageAvatar}
+                  source={{ uri: user.profilePhoto }}
+                />
+              )}
               <View style={styles.rounderBTNWrapper}>
-                <RoundedBTN />
+                <RoundedBTN onPress={onPickImage} />
               </View>
             </View>
           </View>
 
-          <Text style={styles.title}>Natali Romanova</Text>
-          <View>
-            <Image
-              style={styles.image}
-              source={require("../assets/images/Forest.png")}
-            />
-            <Text style={styles.subTitle}>Ліс</Text>
-            <View style={styles.infoWrapper}>
-              <View style={styles.infoContainer}>
-                <View style={styles.elementWrapper}>
-                  <Pressable onPress={() => navigation.navigate("Comments")}>
-                    <FontAwesome
-                      name="comment"
-                      color={COLORS.main_accent_color}
-                      size={24}
-                    />
-                  </Pressable>
+          <Text style={styles.title}>{user.displayName}</Text>
 
-                  <Text>8</Text>
+          <ScrollView>
+            {posts?.map((post) => {
+              return (
+                <View>
+                  <Image style={styles.image} source={{ uri: post.imageUrl }} />
+                  <Text style={styles.subTitle}>{post.description}</Text>
+                  <View style={styles.infoWrapper}>
+                    <View style={styles.infoContainer}>
+                      <View style={styles.elementWrapper}>
+                        <Pressable
+                          onPress={() =>
+                            navigation.navigate("Comments", {
+                              postId: post.postId,
+                            })
+                          }
+                        >
+                          <FontAwesome
+                            name="comment"
+                            color={COLORS.main_accent_color}
+                            size={24}
+                          />
+                        </Pressable>
+
+                        <Text>{post.comments.length}</Text>
+                      </View>
+                      <View style={styles.elementWrapper}>
+                        <AntDesign
+                          name="like2"
+                          color={COLORS.main_accent_color}
+                          size={24}
+                        />
+                        <Text>{post.likes}</Text>
+                      </View>
+                    </View>
+
+                    <View style={styles.elementWrapper}>
+                      <Pressable onPress={() => navigation.navigate("Map")}>
+                        <FontAwesome5
+                          style={{ marginRight: 4 }}
+                          name="map-marker-alt"
+                          size={24}
+                          color={COLORS.light_text_color}
+                        />
+                      </Pressable>
+
+                      <Text>{post.location}</Text>
+                    </View>
+                  </View>
                 </View>
-                <View style={styles.elementWrapper}>
-                  <AntDesign
-                    name="like2"
-                    color={COLORS.main_accent_color}
-                    size={24}
-                  />
-                  <Text>815</Text>
-                </View>
-              </View>
-
-              <View style={styles.elementWrapper}>
-                <Pressable onPress={() => navigation.navigate("Map")}>
-                  <FontAwesome5
-                    style={{ marginRight: 4 }}
-                    name="map-marker-alt"
-                    size={24}
-                    color={COLORS.light_text_color}
-                  />
-                </Pressable>
-
-                <Text>Ukraine</Text>
-              </View>
-            </View>
-          </View>
+              );
+            })}
+          </ScrollView>
         </View>
       </View>
     </View>
@@ -137,6 +205,9 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   imageAvatar: {
+    borderRadius: 16,
+    width: "100%",
+    height: "100%",
     position: "absolute",
   },
 
@@ -166,6 +237,7 @@ const styles = StyleSheet.create({
   image: {
     borderRadius: 16,
     width: "100%",
+    height: 280,
   },
   subTitle: {
     marginTop: 8,
@@ -187,5 +259,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 6,
     alignItems: "center",
+    marginBottom: 24,
   },
 });

@@ -17,12 +17,22 @@ import { COLORS } from "../styles/global";
 import { Input } from "../components/Inputs/Input";
 import { MainBTN } from "../components/Buttons/MainBTN";
 import { OnlyTextBTN } from "../components/Buttons/OnlyTextBTN";
+import { loginDB } from "../helpers/auth";
+import { useDispatch } from "react-redux";
 
 export const LoginScreen = ({ navigation }: navigationProps) => {
   const [secureTextEntry, setSecureTextEntry] = useState(true);
-
+  const dispatch = useDispatch();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const handlerSecureTextEntry = () => {
     setSecureTextEntry(() => !secureTextEntry);
+  };
+
+  
+
+  const onLogIn = () => {
+    loginDB({ email, password }, dispatch);
   };
 
   return (
@@ -41,10 +51,14 @@ export const LoginScreen = ({ navigation }: navigationProps) => {
             <Text style={styles.title}>Увійти</Text>
 
             <View style={styles.inputsWrapper}>
-              <Input placeholder="Адреса електронної пошти" />
+              <Input
+                onChangeText={(text) => setEmail(text)}
+                placeholder="Адреса електронної пошти"
+              />
               <Input
                 secureTextEntry={secureTextEntry}
                 placeholder="Пароль"
+                onChangeText={(text) => setPassword(text)}
                 style={styles.customInputStyles}
                 additionalContent={
                   <OnlyTextBTN
@@ -56,10 +70,7 @@ export const LoginScreen = ({ navigation }: navigationProps) => {
             </View>
 
             <View style={styles.buttonWrapper}>
-              <MainBTN
-                onPress={() => navigation.navigate("Main")}
-                CTA={"Увійти"}
-              />
+              <MainBTN onPress={onLogIn} CTA={"Увійти"} />
               <View style={styles.textButtonWrapper}>
                 <Text style={styles.customText}>Немає акаунту?</Text>
                 <OnlyTextBTN

@@ -1,11 +1,13 @@
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { ActivityIndicator } from "react-native";
 import { useEffect } from "react";
 import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
 import "react-native-gesture-handler";
-import { StackNavigator } from "./navigation/StackNavigator";
-import { NavigationContainer } from "@react-navigation/native";
-
+import { PersistGate } from "redux-persist/integration/react";
+import { Provider } from "react-redux";
+import store from "./redux/store";
+import { Text } from "react-native-elements";
+import { AuthListener } from "./components/AuthListener";
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
@@ -27,17 +29,13 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer>
-      <View style={styles.container}>
-        <StackNavigator />
-      </View>
-    </NavigationContainer>
+    <Provider store={store.store}>
+      <PersistGate
+        loading={<Text>Loading...</Text>}
+        persistor={store.persistor}
+      >
+        <AuthListener />
+      </PersistGate>
+    </Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-});

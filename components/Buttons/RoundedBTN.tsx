@@ -4,12 +4,14 @@ import { TouchableOpacity } from "react-native";
 import Ionicons from "react-native-vector-icons/Ionicons";
 
 import { COLORS } from "../../styles/global";
-
-export const RoundedBTN = () => {
+interface IProps {
+  onPress?: () => void;
+}
+export const RoundedBTN = ({ onPress }: IProps) => {
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.button} onPress={() => alert("Button Pressed!")}>
-        <Ionicons name="add" size={20} color={COLORS.main_accent_color} /> 
+      <TouchableOpacity style={styles.button} onPress={onPress}>
+        <Ionicons name="add" size={20} color={COLORS.main_accent_color} />
       </TouchableOpacity>
     </View>
   );

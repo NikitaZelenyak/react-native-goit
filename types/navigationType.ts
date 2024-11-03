@@ -5,7 +5,7 @@ type RootStackParamList = {
   Registration: undefined;
   Main: undefined;
   Home: undefined;
-  Comments: undefined;
+  Comments: { postId: string | null };
   AddPost: { photoUri: string | null };
   Camera: { photoUri: string | null };
   Map: undefined;

@@ -11,8 +11,41 @@ import {
 import { Input } from "../components/Inputs/Input";
 import { COLORS } from "../styles/global";
 import AntDesign from "react-native-vector-icons/AntDesign";
+import { navigationProps } from "../types/navigationType";
+import { useCallback, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import { addComment, getPostById } from "../helpers/firestore";
+import { PostData } from "../types/postsDataTypes";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
 
-export const CommentsScreen = () => {
+export const CommentsScreen = ({ navigation, route }: navigationProps) => {
+  const [post, setPost] = useState<PostData | undefined>();
+  const [comment, setComment] = useState("");
+  const postId = route?.params?.postId;
+  const user = useSelector((state: RootState) => state.user);
+  const getPost = async () => {
+    if (postId) {
+      const fetchedPosts = await getPostById(postId);
+      if (fetchedPosts) {
+        setPost(fetchedPosts);
+      }
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      getPost();
+    }, [postId])
+  );
+  console.log(post);
+
+  const onAddComment = () => {
+    if (user.uid) {
+      addComment(postId, user.uid, comment);
+    }
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
@@ -20,12 +53,23 @@ export const CommentsScreen = () => {
       keyboardVerticalOffset={100}
     >
       <ScrollView>
-        <Image
-          style={styles.image}
-          source={require("../assets/images/Forest.png")}
-        />
+        <Image style={styles.image} source={{ uri: post?.imageUrl }} />
         <View style={styles.comments}>
-          <View style={styles.commentWrapper}>
+          {post?.comments.map((comment) => {
+            return (
+              <View style={styles.commentWrapper}>
+                <Image
+                  style={styles.userIcon}
+                  source={require("../assets/images/Forest.png")}
+                />
+                <View style={[styles.commentBoxCommon, styles.commentBoxLeft]}>
+                  <Text style={styles.text}>{comment.comment}</Text>
+                  <Text style={[styles.dateText]}>{comment.createdAt}</Text>
+                </View>
+              </View>
+            );
+          })}
+          {/* <View style={styles.commentWrapper}>
             <Image
               style={styles.userIcon}
               source={require("../assets/images/Forest.png")}
@@ -41,24 +85,23 @@ export const CommentsScreen = () => {
 
           <View style={styles.commentWrapper}>
             <View style={[styles.commentBoxCommon, styles.commentBoxRight]}>
-              <Text style={styles.text}>
-                Thank you!
-              </Text>
+              <Text style={styles.text}>Thank you!</Text>
               <Text style={[styles.dateText]}>10 червня, 2020 | 12:10</Text>
             </View>
             <Image
               style={styles.userIcon}
               source={require("../assets/images/Rectangle 22.png")}
             />
-          </View>
+          </View> */}
         </View>
       </ScrollView>
 
       <Input
         style={styles.input}
+        onChangeText={(text) => setComment(text)}
         placeholder="Коментувати..."
         additionalContent={
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity onPress={onAddComment} style={styles.button}>
             <AntDesign name="arrowup" size={18} color={COLORS.main_bg} />
           </TouchableOpacity>
         }
@@ -79,6 +122,7 @@ const styles = StyleSheet.create({
   image: {
     borderRadius: 16,
     width: "100%",
+    height: 280,
   },
   userIcon: {
     width: 28,
